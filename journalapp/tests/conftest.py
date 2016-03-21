@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 import pytest
-from sqlalchemy import create_engine
+import os
 
+from sqlalchemy import create_engine
 from journalapp.models import DBSession, Base
 
-
-TEST_DATABASE_URL = 'postgresql+psycopg2://jackbot:@localhost:5432'
+TEST_DATABASE_URL = 'postgresql+psycopg2://jackbot:@localhost:5432/'
+# TEST_DATABASE_URL = os.environ.get('JOURNAL_APP_TEST', None)
 
 
 @pytest.fixture(scope='session')

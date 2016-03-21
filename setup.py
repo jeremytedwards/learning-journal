@@ -18,6 +18,7 @@ requires = [
     'zope.sqlalchemy',
     'waitress',
     'psycopg2',
+    'markdown',
     ]
 
 
@@ -57,7 +58,8 @@ setup(name='journalapp',
         'test': tests_require,
         'dev': dev_requires,
       },
-      entry_points="""\
+      entry_points=
+      """
       [paste.app_factory]
       main = journalapp:main
       [console_scripts]
