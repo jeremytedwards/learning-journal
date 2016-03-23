@@ -2,6 +2,8 @@ from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
 import os
+# import authn
+# import authz
 
 from .models import (
     DBSession,
