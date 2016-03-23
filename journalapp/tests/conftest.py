@@ -7,15 +7,15 @@ from webob import multidict
 import pytest
 import os
 
-# TEST_DATABASE_URL = 'postgresql+psycopg2://jackbot:@localhost:5432/'
-# TEST_DATABASE_URL = 'postgresql+psycopg2://journalapp:journalapp@localhost:5432/'
-TEST_DATABASE_URL = os.environ.get('JOURNAL_APP_TEST', 'sqlite://')
-# TEST_DATABASE_URL = 'sqlite://'
+# DATABASE_URL_TEST = 'postgresql+psycopg2://jackbot:@localhost:5432/'
+# DATABASE_URL_TEST = 'postgresql+psycopg2://journalapp:journalapp@localhost:5432/'
+DATABASE_URL_TEST = os.environ.get('DATABASE_URL_TEST', 'sqlite://')
+# DATABASE_URL_TEST = 'sqlite://'
 
 
 @pytest.fixture(scope='session')
 def sqlengine(request):
-    engine = create_engine(TEST_DATABASE_URL)
+    engine = create_engine(DATABASE_URL_TEST)
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
 
@@ -48,7 +48,7 @@ def app(config_uri):
     from webtest import TestApp
     from pyramid.paster import get_appsettings
     settings = get_appsettings(config_uri)
-    settings['sqlalchemy.url'] = TEST_DATABASE_URL
+    settings['sqlalchemy.url'] = DATABASE_URL_TEST
     app = main({}, **settings)
     return TestApp(app)
 

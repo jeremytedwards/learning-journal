@@ -10,10 +10,8 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'markdown',
-    'psycopg2',
     'pyramid',
     'pyramid_jinja2',
-    'pyramid_debugtoolbar',
     'pyramid_tm',
     'psycopg2',
     'SQLAlchemy',
@@ -25,6 +23,7 @@ requires = [
 
 
 tests_require = [
+
     'pytest',
     'pytest-watch',
     'tox',
@@ -33,6 +32,7 @@ tests_require = [
 
 dev_requires = [
     'ipython',
+    'pyramid_debugtoolbar',
     'pyramid-ipython',
 ]
 
