@@ -1,10 +1,29 @@
 {# home view #}
 {% extends "blog_base.jinja2"  %}
 {%  block show_item %}
-    <p>In: Blog_home</p>
-    <ul id="blog_listings">
-        {% for post in blog_posts %}
-            <li><a href="/entry/{{ post.id }}">{{ post.title | markdown | safe }} - {{ post.created }}</a></li>
-        {% endfor %}
-    </ul>
+    {% for post in blog_posts %}
+        <header>
+            <!--
+                Note: Titles and subtitles will wrap automatically when necessary, so don't worry
+                if they get too long. You can also remove the <p> entirely if you don't
+                need a subtitle.
+            -->
+            <h2><a href="/entry/{{ post.id }}">{{ post.title | markdown | safe }}</a></h2>
+        </header>
+        <div class="info">
+            <!--
+                Note: The date should be formatted exactly as it's shown below. In particular, the
+                "least significant" characters of the month should be encapsulated in a <span>
+                element to denote what gets dropped in 1200px mode (eg. the "uary" in "January").
+                Oh, and if you don't need a date for a particular page or post you can simply delete
+                the entire "date" element.
+
+            -->
+            <span class="date">
+                <span class="month">{{ post.created }}<span></span>y</span>
+                <span class="day">{{ post.created }}</span>
+                <span class="year">, {{ post.created }}</span>
+            </span>
+        </div>
+    {% endfor %}
 {% endblock %}
