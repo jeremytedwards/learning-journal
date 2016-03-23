@@ -3,8 +3,9 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from sqlalchemy import engine_from_config
 
+
 import os
-from passlib.hash import sha256_crypt
+
 
 from .models import DBSession, Base
 
@@ -23,13 +24,8 @@ def main(global_config, **settings):
     authn_policy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()
 
-    # generate new salt, and hash a password
-    hash = sha256_crypt.encrypt("toomanysecrets")
-    # verifying the password
-
-    if sha256_crypt.verify("toomanysecrets", hash):
-        settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
-        settings['auth.password'] = os.environ.get('AUTH_PASSWORD', hash)
+    settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
+    settings['auth.password'] = os.environ.get('AUTH_PASSWORD', hash)
 
     ## Config settings
     config = Configurator(settings=settings)

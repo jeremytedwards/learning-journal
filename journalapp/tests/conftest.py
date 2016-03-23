@@ -42,6 +42,15 @@ def dbtransaction(request, sqlengine):
 
 
 @pytest.fixture(scope='session')
+def config_uri():
+    """Establish configuration uri for initialization."""
+    parent_dir = os.path.dirname(__file__)
+    gparent_dir = os.path.dirname(parent_dir)
+    ggparent_dir = os.path.dirname(gparent_dir)
+    return os.path.join(ggparent_dir, 'development.ini')
+
+
+@pytest.fixture(scope='session')
 def app(config_uri):
     """Create pretend app fixture of our main app."""
     from journalapp import main
@@ -51,12 +60,6 @@ def app(config_uri):
     settings['sqlalchemy.url'] = DATABASE_URL_TEST
     app = main({}, **settings)
     return TestApp(app)
-
-
-# @pytest.fixture()
-# def session(dbtransaction):
-#     from journalapp.models import DBSession
-#     return DBSession
 
 
 @pytest.fixture()
@@ -95,3 +98,10 @@ def dummy_post_request(request, dummy_request):
     dummy_request.POST = multidict.MultiDict([('title', 'TESTadd'),
                                               ('text', 'TESTadd')])
     return dummy_request
+
+
+@pytest.fixture()
+def auth_env():
+    from journalapp.security import is_admin_pw, hash_of_pw
+    os.environ['AUTH_USERNAME'] = 'SecretUser'
+    os.environ['AUTH_PASSWORD'] = hash_of_pw('SecretPwd!')

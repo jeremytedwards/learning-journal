@@ -1,21 +1,18 @@
 # coding=utf-8
 import os
-import pytest
-import webtest
 
 
-@pytest.fixture()
-def app():
-    settings = {'sqlalchemy.url': 'sqlite:////tmp/foobar/'}
-    app = main({}, settings)
-    return webtest.TestApp(app)
+def test_un_exist(app):
+    assert os.environ.get('AUTH_USERNAME', None) is not None
 
 
-@pytest.fixture()
-def auth_env():
-    from foobar.security import pwd_context
-    os.environ['AUTH_USERNAME'] = pwd_context.'SecretUser'
-    os.environ['AUTH_PASSWORD'] = 'SecretPwd!'
+def test_pw_exist(app):
+    assert os.environ.get('AUTH_PASSWORD', None) is not None
+
+
+def test_password_is_encrypted(auth_env):
+    """Test the password is encrypted."""
+    assert os.environ.get('AUTH_PASSWORD', None) != 'SecretPwd!'
 
 
 def test_secure_view(app):
@@ -28,24 +25,16 @@ def test_accesss_view(app):
     assert response.status_code == 200
 
 
-def test_un_exist(app):
-    assert os.environ.get('AUTH_USERNAME', None) is not 'SecretUser'
-
-
-def test_pw_exist(app):
-    assert os.environ.get('AUTH_PASSWORD', None) is not None
-
-
 def test_check_pw_success(auth_env):
-    from foobar.security import check_pw
+    from journalapp.security import is_admin_pw
     password = 'SecretPwd!'
-    assert not check_pw(password)
+    assert is_admin_pw(password)
 
 
 def test_check_pw_fail(auth_env):
-    from foobar.security import check_pw
-    password = 'SecretPwd!'
-    assert check_pw(password)
+    from journalapp.security import is_admin_pw
+    password = '!dwPterceS'
+    assert not is_admin_pw(password)
 
 
 def test_get_login_view(app):
