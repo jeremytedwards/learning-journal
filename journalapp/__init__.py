@@ -12,7 +12,7 @@ from .models import DBSession, Base
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application."""
     ## DBConnection
-    database_url = os.environ.get('JOURNAL_APP', None)
+    database_url = os.environ.get('DATABASE_URL', None)
     if database_url is not None:
         settings['sqlalchemy.url'] = database_url
     engine = engine_from_config(settings, 'sqlalchemy.')

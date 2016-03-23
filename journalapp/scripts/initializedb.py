@@ -33,7 +33,7 @@ def main(argv=sys.argv):
     settings = get_appsettings(config_uri, options=options)
 
     # Set sqlalchemy.url
-    database_url = os.environ.get('JOURNAL_APP', None)
+    database_url = os.environ.get('DATABASE_URL', None)
     if database_url is not None:
         settings['sqlalchemy.url'] = database_url
 
