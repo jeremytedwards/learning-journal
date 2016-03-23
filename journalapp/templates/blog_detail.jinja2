@@ -3,7 +3,7 @@
 {%  block show_item %}
 <article class="box post post-excerpt">
     <header>
-        <h2><a href="#">{{ post["posts"][0].title }}</a></h2>
+        <h2><a href="#">{{ post.title | markdown | safe }}</a></h2>
 {#        <p>Feugiat interdum sed commodo ipsum consequat dolor nullam metus</p>#}
     </header>
     <div class="info">
@@ -16,9 +16,7 @@
         </ul>
     </div>
     <a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
-    <p>
-        {{ post["posts"][0].text }}
-    </p>
+    <p>{{ post.text | markdown | safe }}</p>
+    <a href="{{ request.route_url('edit', pkey=post.id) }}">&lt;&mdash;Edit</a>
 </article>
-
 {% endblock %}

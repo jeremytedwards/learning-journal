@@ -3,7 +3,7 @@
 {%  block show_item %}
     <p>In: Blog_home</p>
     <ul id="blog_listings">
-        {% for post in blog_posts["posts"] %}
+        {% for post in blog_posts %}
             <li><a href="/entry/{{ post.id }}">{{ post.title | markdown | safe }} - {{ post.created }}</a></li>
         {% endfor %}
     </ul>

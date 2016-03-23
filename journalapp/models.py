@@ -17,8 +17,8 @@ from sqlalchemy.orm import (
 from zope.sqlalchemy import ZopeTransactionExtension
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-Base = declarative_base()
 
+Base = declarative_base()
 
 class Entry(Base):
     """Class for creating database blog entries."""
@@ -27,6 +27,5 @@ class Entry(Base):
     title = Column(Unicode(128), unique=True)
     text = Column(Unicode())
     created = Column(DateTime, default=datetime.datetime.utcnow)
-
 
 Index('my_index', Entry.title, unique=True)

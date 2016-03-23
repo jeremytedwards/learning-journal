@@ -9,16 +9,17 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
     CHANGES = f.read()
 
 requires = [
+    'markdown',
+    'psycopg2',
     'pyramid',
     'pyramid_jinja2',
     'pyramid_debugtoolbar',
     'pyramid_tm',
     'SQLAlchemy',
     'transaction',
-    'zope.sqlalchemy',
     'waitress',
-    'psycopg2',
-    'markdown',
+    'wtforms',
+    'zope.sqlalchemy',
     ]
 
 

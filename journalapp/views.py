@@ -1,28 +1,24 @@
 # coding=utf-8
 from .models import DBSession, Entry
 from .form_new import NewBlogEntryForm
-# from jinja2 import Markup
-
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.view import view_config
 from sqlalchemy import desc
-
-# import markdown
-import transaction
+from sqlalchemy.exc import IntegrityError
+from webob.multidict import NoVars
 
 
 def query_table():
-    return {'posts': DBSession.query(Entry).order_by(desc(Entry.created))}
+    return DBSession.query(Entry).order_by(desc(Entry.created))
 
 
 def query_post(post_id):
-    return {'posts': DBSession.query(Entry).filter(Entry.id == post_id)}
+    return DBSession.query(Entry).get(post_id)
 
 
 def new_entry(new_title=None, new_text=None):
     DBSession.add(Entry(title=new_title, text=new_text))
     DBSession.flush()
-    transaction.commit()
     new_id = DBSession.query(Entry).order_by(desc(Entry.created))[0].id
     return new_id
 
@@ -34,7 +30,6 @@ def edit_entry(pkey, new_title, new_text):
     }
     DBSession.query(Entry).filter(Entry.id==pkey).update(update_dict)
     DBSession.flush()
-    transaction.commit()
     return pkey
 
 
@@ -48,13 +43,14 @@ def home(request):
 def detail(request):
     pkey = request.matchdict.get("pkey")
     one_post = query_post(pkey)
-
+    if one_post is None:
+        raise HTTPNotFound
     return dict(post=one_post)
 
 
 @view_config(route_name='new', renderer='templates/blog_new.jinja2')
 def new(request):
-    form = NewBlogEntryForm(request.POST)
+    form = NewBlogEntryForm(request.POST or NoVars())
     if request.method == "POST":
         new_pkey = new_entry(form.title.data, form.text.data)
         next_url = request.route_url('detail', pkey=new_pkey)
@@ -66,15 +62,16 @@ def new(request):
 def edit(request):
     pkey = request.matchdict.get("pkey")
     entry = DBSession.query(Entry).get(pkey)
+    if entry is None:
+        raise HTTPNotFound
     form = NewBlogEntryForm(request.POST, entry)
     if request.method == "POST":
-        form.populate_obj(entry)
-        current_pkey = edit_entry(pkey, form.title.data, form.text.data)
-        next_url = request.route_url('detail', pkey=current_pkey)
-        return HTTPFound(location=next_url)
+        try:
+            form.populate_obj(entry)
+            current_pkey = edit_entry(pkey, form.title.data, form.text.data)
+            next_url = request.route_url('detail', pkey=current_pkey)
+            return HTTPFound(location=next_url)
+        except IntegrityError:
+            form.errors.setdefault('error', []).append("Ah oh something "
+                                                       "went wrong")
     return {'form': form}
-
-
-# def render_markdown(content):
-#     output = Markup(markdown.markdown(content))
-#     return output
