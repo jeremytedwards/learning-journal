@@ -15,7 +15,7 @@
             <li><a href="#" class="icon fa-facebook">128</a></li>
         </ul>
     </div>
-    <a href="#" class="image featured"><img src="images/pic02.jpg" alt="" /></a>
+    <a href="#" class="image featured"><img src="../static/images/pic02.jpg" alt="" /></a>
     <p>{{ post.text | markdown | safe }}</p>
     <a href="{{ request.route_url('edit', pkey=post.id) }}">&lt;&mdash;Edit</a>
 </article>
