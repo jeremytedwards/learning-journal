@@ -22,10 +22,9 @@
 
                 -->
                 <span class="date">
-                    {{ post.created }}
-{#                    <span class="month">{{ post.created }}<span></span>y</span>#}
-{#                    <span class="day">{{ post.created }}</span>#}
-{#                    <span class="year">, {{ post.created }}</span>#}
+{#                    {{ post.created }}#}
+                    <span class="month">{{ post.created | dateformat_monthfull }}</span>
+                    <span class="day">{{ post.created | dateformat_day }}</span>
                 </span>
                 <!--
                     Note: You can change the number of list items in "stats" to whatever you want.

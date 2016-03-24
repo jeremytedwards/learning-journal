@@ -9,9 +9,9 @@
         </header>
         <div class="info">
             <span class="date">
-                {{ post.created }}
-{#                <span class="month">{{ post.created }}<span></span>y</span>#}
-{#                <span class="day">{{ post.created }}</span>#}
+{#                {{ post.created }}#}
+                <span class="month">{{ post.created | dateformat_monthfull }}</span>
+                <span class="day">{{ post.created | dateformat_day }}</span>
 {#                <span class="year">, {{ post.created }}</span>#}
             </span>
 {#            <ul class="stats">#}
