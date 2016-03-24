@@ -117,7 +117,7 @@ def dummy_post_request(request, dummy_request):
 
 @pytest.fixture()
 def auth_env():
-    from journalapp.security import is_valid_pw, hash_of_pw
+    from journalapp.security import hash_of_pw
     os.environ['AUTH_USERNAME'] = 'SecretUser'
     os.environ['AUTH_PASSWORD'] = hash_of_pw('SecretPwd!')
 
