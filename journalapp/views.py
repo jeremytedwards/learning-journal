@@ -2,10 +2,10 @@
 from .form_new import NewBlogEntryForm
 from .form_login import LoginForm
 from .models import DBSession, Entry
-from .security import is_admin_pw
+from .security import is_valid_pw
 
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
-from pyramid.security import remember, forget
+from pyramid.security import remember, forget, authenticated_userid
 from pyramid.view import view_config
 
 from sqlalchemy import desc
@@ -39,13 +39,17 @@ def edit_entry(pkey, new_title, new_text):
     return pkey
 
 
-@view_config(route_name='home', renderer='templates/blog_home.jinja2')
+@view_config(route_name='home',
+             renderer='templates/blog_home.jinja2',
+             permission='view')
 def home(request):
     all_posts = query_table()
     return dict(blog_posts=all_posts)
 
 
-@view_config(route_name='detail', renderer='templates/blog_detail.jinja2')
+@view_config(route_name='detail',
+             renderer='templates/blog_detail.jinja2',
+             permission='view')
 def detail(request):
     pkey = request.matchdict.get("pkey")
     one_post = query_post(pkey)
@@ -54,9 +58,35 @@ def detail(request):
     return dict(post=one_post)
 
 
-@view_config(route_name='new', renderer='templates/blog_new.jinja2',
-             permission='add')
+@view_config(route_name='login',
+             renderer='templates/blog_login.jinja2',
+             permission='view')
+def login(request):
+    form = LoginForm(request.POST)
+    if request.method == 'POST' and form.validate():
+        username = form.username.data
+        password = form.password.data
+        if is_valid_pw(password):
+            headers = remember(request, username)
+            return HTTPFound(location='/', headers=headers)
+    return {'form': form}
+
+
+@view_config(route_name='logout',
+             permission='view')
+def logout(request):
+    if authenticated_userid(request):
+        headers = forget(request)
+        return HTTPFound(location='/', headers=headers)
+    return HTTPFound(location=request.route_url('login'))
+
+
+@view_config(route_name='new',
+             renderer='templates/blog_new.jinja2')
 def new(request):
+    if not authenticated_userid(request):
+        return HTTPFound(location=request.route_url('login'))
+
     form = NewBlogEntryForm(request.POST or NoVars())
     if request.method == "POST":
         new_pkey = new_entry(form.title.data, form.text.data)
@@ -65,9 +95,12 @@ def new(request):
     return {'form': form}
 
 
-@view_config(route_name='edit', renderer='templates/blog_edit.jinja2',
-             permission="edit")
+@view_config(route_name='edit',
+             renderer='templates/blog_edit.jinja2')
 def edit(request):
+    if not authenticated_userid(request):
+        return HTTPFound(location=request.route_url('login'))
+
     pkey = request.matchdict.get("pkey")
     entry = DBSession.query(Entry).get(pkey)
     if entry is None:
@@ -82,38 +115,6 @@ def edit(request):
         except IntegrityError:
             form.errors.setdefault('error', []).append("Ah oh something "
                                                        "went wrong")
-    return {'form': form}
-
-
-#@view_config(method="POST", route_name='login', "
-#                    "renderer='templates/blog_login.jinja2')
-
-@view_config(route_name='login', renderer='templates/blog_login.jinja2')
-def login(request):
-    form = LoginForm(request.POST or NoVars())
-    if request.method == "POST":
-        # Process the form
-
-        username = request.params['username']
-        password = request.params['password']
-
-        settings = request.registry.settings
-
-        auth_username = settings.get('auth.username', '')
-        hashed_pw = settings.get('auth.password', '')
-
-        if username == auth_username:
-            if is_admin_pw(hashed_pw, password):
-                headers = remember(request, username)
-                return HTTPFound(location=request.route_url('list'),
-                                 headers=headers)
-        #     else:
-        #         form.errors.append('Invalid password.')
-        # else:
-        #     form.errors.append('Invalid username.')
-
-        # next_url = request.route_url('home')
-        # return HTTPFound(location=next_url)
     return {'form': form}
 
 

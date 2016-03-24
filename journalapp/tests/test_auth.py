@@ -16,15 +16,15 @@ def test_password_is_encrypted(auth_env):
 
 
 def test_check_pw_success(auth_env):
-    from journalapp.security import is_admin_pw
+    from journalapp.security import is_valid_pw
     password = 'SecretPwd!'
-    assert is_admin_pw(password)
+    assert is_valid_pw(password)
 
 
 def test_check_pw_fail(auth_env):
-    from journalapp.security import is_admin_pw
+    from journalapp.security import is_valid_pw
     password = '!dwPterceS'
-    assert not is_admin_pw(password)
+    assert not is_valid_pw(password)
 
 
 def test_secure_view(app):

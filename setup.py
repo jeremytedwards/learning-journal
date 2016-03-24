@@ -10,6 +10,7 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'markdown',
+    'passlib'
     'pyramid',
     'pyramid_jinja2',
     'pyramid_tm',
