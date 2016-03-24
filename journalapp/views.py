@@ -1,6 +1,7 @@
 # coding=utf-8
 from .models import DBSession, Entry
 from .form_new import NewBlogEntryForm
+from .form_login import LoginForm
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.view import view_config
 from sqlalchemy import desc
@@ -48,7 +49,8 @@ def detail(request):
     return dict(post=one_post)
 
 
-@view_config(route_name='new', renderer='templates/blog_new.jinja2')
+@view_config(route_name='new', renderer='templates/blog_new.jinja2',
+             permission='add')
 def new(request):
     form = NewBlogEntryForm(request.POST or NoVars())
     if request.method == "POST":
@@ -58,7 +60,8 @@ def new(request):
     return {'form': form}
 
 
-@view_config(route_name='edit', renderer='templates/blog_edit.jinja2')
+@view_config(route_name='edit', renderer='templates/blog_edit.jinja2',
+             permission="edit")
 def edit(request):
     pkey = request.matchdict.get("pkey")
     entry = DBSession.query(Entry).get(pkey)
@@ -74,4 +77,15 @@ def edit(request):
         except IntegrityError:
             form.errors.setdefault('error', []).append("Ah oh something "
                                                        "went wrong")
+    return {'form': form}
+
+
+@view_config(route_name='login', renderer='templates/blog_login.jinja2')
+def login(request):
+    form = LoginForm(request.POST or NoVars())
+    if request.method == "POST":
+        # Process the form
+        # new_auth = new_entry(form.un.data, form.pw.data)
+        next_url = request.route_url('home')
+        return HTTPFound(location=next_url)
     return {'form': form}

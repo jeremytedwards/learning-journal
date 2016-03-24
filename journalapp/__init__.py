@@ -6,7 +6,6 @@ from sqlalchemy import engine_from_config
 
 import os
 
-
 from .models import DBSession, Base
 
 
@@ -24,7 +23,7 @@ def main(global_config, **settings):
     authn_policy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
     authz_policy = ACLAuthorizationPolicy()
 
-    settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
+    settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'SecretUser')
     settings['auth.password'] = os.environ.get('AUTH_PASSWORD', hash)
 
     ## Config settings
