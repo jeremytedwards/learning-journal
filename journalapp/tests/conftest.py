@@ -51,6 +51,12 @@ def config_uri():
 
 
 @pytest.fixture(scope='session')
+def good_login_params():
+    """Create correct login information."""
+    return {'username': 'SecretUser', 'password': 'SecretPwd!'}
+
+
+@pytest.fixture(scope='session')
 def app(config_uri):
     """Create pretend app fixture of our main app."""
     from journalapp import main
@@ -60,6 +66,13 @@ def app(config_uri):
     settings['sqlalchemy.url'] = DATABASE_URL_TEST
     app = main({}, **settings)
     return TestApp(app)
+
+
+@pytest.fixture()
+def authenticated_app(app, auth_env, good_login_params):
+    """Create a version of the app with an authenticated user."""
+    app.post('/login/', params=good_login_params, status='3*')
+    return app
 
 
 @pytest.fixture()
@@ -106,3 +119,4 @@ def auth_env():
     from journalapp.security import is_admin_pw, hash_of_pw
     os.environ['AUTH_USERNAME'] = 'SecretUser'
     os.environ['AUTH_PASSWORD'] = hash_of_pw('SecretPwd!')
+

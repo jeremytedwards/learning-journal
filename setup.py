@@ -66,5 +66,6 @@ setup(name='journalapp',
       main = journalapp:main
       [console_scripts]
       initializedb = journalapp.scripts.initializedb:main
+      load_api = journalapp.scripts.load_api(*args,**kwargs):main
       """,
       )

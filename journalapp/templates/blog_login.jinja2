@@ -1,17 +1,17 @@
 {% extends "blog_base.jinja2" %}
 {% block show_item %}
     <h2>Login</h2>
-    {% if error -%}
-        <p class="error"><strong>Error</strong>: {{ error }}
-    {%- endif %}
+    {% if form.errors %}
+        <p class="errors">Error: {{ form.errors.pop() }}</p>
+    {% endif %}
     <form action="" method="POST">
         <div class="field">
             <label for="title">User Name</label>
-            {{ form.un(size=30, maxlength=50) | markdown | safe }}
+            {{ form.username(size=30, maxlength=50) | markdown | safe }}
         </div>
         <div class="field">
             <label for="Content">Password</label>
-            {{ form.pw(size=30, maxlength=50) | markdown | safe }}
+            {{ form.password(size=30, maxlength=50) | markdown | safe }}
         </div>
         <div class="submit">
             <input type="submit" name="submit" value="submit"/>

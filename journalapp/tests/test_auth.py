@@ -38,12 +38,23 @@ def test_accesss_view(app):
 
 
 def test_get_login_view(app):
-    response = app.get('/login')
+    response = app.get('/login/')
     assert response.status_code == 200
 
 
 def test_post_login_view(app, auth_env):
     data = {'username': 'SecretUser', "password": 'SecretPwd!'}
-    response = app.get('/login', data)
+    response = app.get('/login/', data)
     assert response.status_code == 200
 
+
+def test_add_no_permission(dbtransaction, app):
+    """Test that add route returns a 403 if not permitted."""
+    response = app.get('/new/', status='4*')
+    assert response.status_code == 403
+
+
+def test_add_with_permission(dbtransaction, authenticated_app):
+    """Test that add route returns a 200 if authenticated."""
+    response = authenticated_app.get('/new/')
+    assert response.status_code == 200

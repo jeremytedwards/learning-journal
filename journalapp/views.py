@@ -1,11 +1,16 @@
 # coding=utf-8
-from .models import DBSession, Entry
 from .form_new import NewBlogEntryForm
 from .form_login import LoginForm
+from .models import DBSession, Entry
+from .security import is_admin_pw
+
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.security import remember, forget
 from pyramid.view import view_config
+
 from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
+
 from webob.multidict import NoVars
 
 
@@ -80,12 +85,45 @@ def edit(request):
     return {'form': form}
 
 
+#@view_config(method="POST", route_name='login', "
+#                    "renderer='templates/blog_login.jinja2')
+
 @view_config(route_name='login', renderer='templates/blog_login.jinja2')
 def login(request):
     form = LoginForm(request.POST or NoVars())
     if request.method == "POST":
         # Process the form
-        # new_auth = new_entry(form.un.data, form.pw.data)
-        next_url = request.route_url('home')
-        return HTTPFound(location=next_url)
+
+        username = request.params['username']
+        password = request.params['password']
+
+        settings = request.registry.settings
+
+        auth_username = settings.get('auth.username', '')
+        hashed_pw = settings.get('auth.password', '')
+
+        if username == auth_username:
+            if is_admin_pw(hashed_pw, password):
+                headers = remember(request, username)
+                return HTTPFound(location=request.route_url('list'),
+                                 headers=headers)
+        #     else:
+        #         form.errors.append('Invalid password.')
+        # else:
+        #     form.errors.append('Invalid username.')
+
+        # next_url = request.route_url('home')
+        # return HTTPFound(location=next_url)
     return {'form': form}
+
+
+#@view_config(renderer='json', xhr=True)
+# def __json__(self, request):
+#     return {
+#         "id": self.title,
+#         "title": self.title,
+#         "text": self.text,
+#         "markdown": self.markdown,
+#         # "created": self.created.
+#     }
+#     pass

@@ -1,12 +1,12 @@
 # coding=utf-8
 from passlib.hash import sha512_crypt
 from pyramid.authentication import AuthTktAuthenticationPolicy
-from pyramid.authorization import ACLAuthorizationPolicy
+# from pyramid.authorization import ACLAuthorizationPolicy
 # from pyramid.config.Configurator import SignedCookieSessionFactory
 from pyramid.security import ALL_PERMISSIONS, Allow, Everyone
-from pyramid.security import Authenticated
-from wtforms.ext.csrf.form import SecureForm
-from hashlib import md5
+# from pyramid.security import Authenticated
+# from wtforms.ext.csrf.form import SecureForm
+# from hashlib import md5
 
 
 import os
@@ -14,6 +14,7 @@ import os
 
 authn_policy = AuthTktAuthenticationPolicy('seekrit', hashalg='sha512')
 # my_session_factory = SignedCookieSessionFactory('itsaseekreet')
+
 
 def is_admin_pw(pw):
     hashed = os.environ.get('AUTH_PASSWORD', 'empty')
