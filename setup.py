@@ -10,7 +10,7 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'markdown',
-    'passlib'
+    'passlib',
     'pyramid',
     'pyramid_jinja2',
     'pyramid_tm',
@@ -66,6 +66,6 @@ setup(name='journalapp',
       main = journalapp:main
       [console_scripts]
       initializedb = journalapp.scripts.initializedb:main
-      load_api = journalapp.scripts.load_api(*args,**kwargs):main
+      load_api = journalapp.scripts.load_api:load_with_key
       """,
       )
