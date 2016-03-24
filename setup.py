@@ -24,7 +24,6 @@ requires = [
 
 
 tests_require = [
-
     'pytest',
     'pytest-watch',
     'tox',
