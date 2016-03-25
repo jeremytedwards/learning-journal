@@ -15,6 +15,7 @@ requires = [
     'pyramid_jinja2',
     'pyramid_tm',
     'psycopg2',
+    'requests',
     'SQLAlchemy',
     'transaction',
     'waitress',
