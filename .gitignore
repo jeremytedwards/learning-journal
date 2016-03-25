@@ -1,4 +1,6 @@
+
 # Byte-compiled / optimized / DLL files
+/journalapp/jeremy-mockups
 __pycache__/
 *.py[cod]
 *$py.class

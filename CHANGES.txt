@@ -1,4 +1,10 @@
+0.5
+---
+
+-  Implementing template
+
 0.0
 ---
 
 -  Initial version
+

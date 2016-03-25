@@ -7,15 +7,15 @@ from webob import multidict
 import pytest
 import os
 
-# TEST_DATABASE_URL = 'postgresql+psycopg2://jackbot:@localhost:5432/'
-# TEST_DATABASE_URL = 'postgresql+psycopg2://journalapp:journalapp@localhost:5432/'
-TEST_DATABASE_URL = os.environ.get('JOURNAL_APP_TEST', 'sqlite://')
-# TEST_DATABASE_URL = 'sqlite://'
+# DATABASE_URL_TEST = 'postgresql+psycopg2://jackbot:@localhost:5432/'
+# DATABASE_URL_TEST = 'postgresql+psycopg2://journalapp:journalapp@localhost:5432/'
+DATABASE_URL_TEST = os.environ.get('DATABASE_URL_TEST', 'sqlite://')
+# DATABASE_URL_TEST = 'sqlite://'
 
 
 @pytest.fixture(scope='session')
 def sqlengine(request):
-    engine = create_engine(TEST_DATABASE_URL)
+    engine = create_engine(DATABASE_URL_TEST)
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
 
@@ -42,21 +42,37 @@ def dbtransaction(request, sqlengine):
 
 
 @pytest.fixture(scope='session')
+def config_uri():
+    """Establish configuration uri for initialization."""
+    parent_dir = os.path.dirname(__file__)
+    gparent_dir = os.path.dirname(parent_dir)
+    ggparent_dir = os.path.dirname(gparent_dir)
+    return os.path.join(ggparent_dir, 'development.ini')
+
+
+@pytest.fixture(scope='session')
+def good_login_params():
+    """Create correct login information."""
+    return {'username': 'SecretUser', 'password': 'SecretPwd!'}
+
+
+@pytest.fixture(scope='session')
 def app(config_uri):
     """Create pretend app fixture of our main app."""
     from journalapp import main
     from webtest import TestApp
     from pyramid.paster import get_appsettings
     settings = get_appsettings(config_uri)
-    settings['sqlalchemy.url'] = TEST_DATABASE_URL
+    settings['sqlalchemy.url'] = DATABASE_URL_TEST
     app = main({}, **settings)
     return TestApp(app)
 
 
-# @pytest.fixture()
-# def session(dbtransaction):
-#     from journalapp.models import DBSession
-#     return DBSession
+@pytest.fixture()
+def authenticated_app(app, auth_env, good_login_params):
+    """Create a version of the app with an authenticated user."""
+    app.post('/login/', params=good_login_params, status='3*')
+    return app
 
 
 @pytest.fixture()
@@ -77,6 +93,8 @@ def dummy_request():
     config.add_route('detail', '/entry/{pkey:\d+}')
     config.add_route('new', '/new/')
     config.add_route('edit', '/edit/{pkey:\d+}')
+    config.add_route('login', '/login/')
+    config.add_route('logout', '/logout/')
     return request
 
 
@@ -95,3 +113,11 @@ def dummy_post_request(request, dummy_request):
     dummy_request.POST = multidict.MultiDict([('title', 'TESTadd'),
                                               ('text', 'TESTadd')])
     return dummy_request
+
+
+@pytest.fixture()
+def auth_env():
+    from journalapp.security import hash_of_pw
+    os.environ['AUTH_USERNAME'] = 'SecretUser'
+    os.environ['AUTH_PASSWORD'] = hash_of_pw('SecretPwd!')
+

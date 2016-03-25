@@ -6,19 +6,16 @@ from sqlalchemy import (
     Unicode,
     DateTime,
 )
-
 from sqlalchemy.ext.declarative import declarative_base
-
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
 )
-
 from zope.sqlalchemy import ZopeTransactionExtension
 
+Base = declarative_base()
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
-Base = declarative_base()
 
 class Entry(Base):
     """Class for creating database blog entries."""
@@ -27,5 +24,6 @@ class Entry(Base):
     title = Column(Unicode(128), unique=True)
     text = Column(Unicode())
     created = Column(DateTime, default=datetime.datetime.utcnow)
+
 
 Index('my_index', Entry.title, unique=True)

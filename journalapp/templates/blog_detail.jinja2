@@ -1,10 +1,28 @@
 {# detail view #}
-{% extends "blog_base.jinja2"  %}
-{%  block show_item %}
-{#    <p>In: Blog_detail id passed:</p>#}
-{#    <p>{{ post }}</p>#}
-    <br />
-    <a href="{{ request.route_url('edit', pkey=post.id) }}">&lt;&mdash;Edit</a>
-    <p>{{ post.title | markdown | safe }}</p>
-    <p>{{ post.text | markdown | safe }}</p>
+{% extends "blog_base.jinja2" %}
+{% block show_item %}
+    <article class="box post post-excerpt">
+        <header>
+            <h2>
+                <a href="{{ request.route_url('edit', pkey=post.id) }}">{{ post.title | markdown | safe }}</a>
+            </h2>
+        </header>
+        <div class="info">
+            <span class="date">
+{#                {{ post.created }}#}
+                <span class="month">{{ post.created | dateformat_monthfull }}</span>
+                <span class="day">{{ post.created | dateformat_day }}</span>
+{#                <span class="year">, {{ post.created }}</span>#}
+            </span>
+{#            <ul class="stats">#}
+{#                <li><a href="#" class="icon fa-comment">16</a></li>#}
+{#                <li><a href="#" class="icon fa-heart">32</a></li>#}
+{#                <li><a href="#" class="icon fa-twitter">64</a></li>#}
+{#                <li><a href="#" class="icon fa-facebook">128</a></li>#}
+{#            </ul>#}
+        </div>
+{#        <a href="{{ request.route_url('edit', pkey=post.id) }}" class="image featured"><img src="../static/images/pic02.jpg" alt=""/></a>#}
+        <p>{{ post.text | markdown | safe }}</p>
+        <p><a href="{{ request.route_url('edit', pkey=post.id) }}">&lt;&mdash;Edit</a></p>
+    </article>
 {% endblock %}
