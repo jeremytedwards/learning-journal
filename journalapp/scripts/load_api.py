@@ -11,12 +11,17 @@ from zope.sqlalchemy import ZopeTransactionExtension
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 
 
-def load_with_key(api_key='bcfc83f6-ccfa-4636-9e40-8646e0319b65'):
+def load_with_key(api_key):
     """
     Opens a DB session
     Collects and processes a JSON into a DB session
     Closes the session
     """
+    # API key check
+    key_check = os.environ.get('API_KEY', None)
+    if key_check:
+        api_key = key_check
+
     # Get DB Session
     database_url = os.environ.get('DATABASE_URL', None)
     print(database_url)
