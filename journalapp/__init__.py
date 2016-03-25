@@ -7,8 +7,8 @@ from sqlalchemy import engine_from_config
 
 import os
 
-from .models import DBSession, Base
-from .security import DefaultRootFactory
+from journalapp.models import DBSession, Base
+from journalapp.security import DefaultRootFactory
 
 
 def main(global_config, **settings):

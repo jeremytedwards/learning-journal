@@ -1,42 +1,17 @@
 # coding=utf-8
-from .form_new import NewBlogEntryForm
-from .form_login import LoginForm
-from .models import DBSession, Entry
-from .security import is_valid_pw
+from journalapp.form_new import NewBlogEntryForm
+from journalapp.form_login import LoginForm
+from journalapp.models import DBSession, Entry
+from journalapp.models import edit_entry, new_entry, query_post, query_table
+from journalapp.security import is_valid_pw
 
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
 from pyramid.security import remember, forget, authenticated_userid
 from pyramid.view import view_config
 
-from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError
 
 from webob.multidict import NoVars
-
-
-def query_table():
-    return DBSession.query(Entry).order_by(desc(Entry.created))
-
-
-def query_post(post_id):
-    return DBSession.query(Entry).get(post_id)
-
-
-def new_entry(new_title=None, new_text=None):
-    DBSession.add(Entry(title=new_title, text=new_text))
-    DBSession.flush()
-    new_id = DBSession.query(Entry).order_by(desc(Entry.created))[0].id
-    return new_id
-
-
-def edit_entry(pkey, new_title, new_text):
-    update_dict = {
-        "title": new_title,
-        "text": new_text,
-    }
-    DBSession.query(Entry).filter(Entry.id==pkey).update(update_dict)
-    DBSession.flush()
-    return pkey
 
 
 @view_config(route_name='home',
