@@ -1,3 +1,3 @@
 #!/bin/bash
-python setup.py journalapp
+python setup.py develop
 initializedb production.ini
