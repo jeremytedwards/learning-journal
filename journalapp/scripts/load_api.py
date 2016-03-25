@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import requests
+import transaction
 
 from journalapp.models import Entry
 from sqlalchemy import engine_from_config
@@ -37,7 +38,8 @@ def load_with_key():
 
     # Flush DB Session
     print("Before:\n", DBSession.new)
-    DBSession.flush()
+    # DBSession.flush()
+    transaction.commit()
     print("After:\n", DBSession.new)
 
 
