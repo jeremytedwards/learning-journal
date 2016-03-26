@@ -1,20 +1,10 @@
 import os
 import sys
-# import transaction
 
-from sqlalchemy import engine_from_config
-
-from pyramid.paster import (
-    get_appsettings,
-    setup_logging,
-)
-
+from journalapp.models import DBSession, Base
+from pyramid.paster import get_appsettings, setup_logging
 from pyramid.scripts.common import parse_vars
-
-from ..models import (
-    DBSession,
-    Base,
-)
+from sqlalchemy import engine_from_config
 
 
 def usage(argv):
@@ -33,10 +23,17 @@ def main(argv=sys.argv):
     settings = get_appsettings(config_uri, options=options)
 
     # Set sqlalchemy.url
-    database_url = os.environ.get('JOURNAL_APP', None)
+    database_url = os.environ.get('DATABASE_URL', None)
     if database_url is not None:
         settings['sqlalchemy.url'] = database_url
 
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
+
+    # # Create an admin user for the journalApp
+    # with transaction.manager:
+    #     # replace the code to create a MyModel instance
+    #     encrypted = password_context.encrypt('admin')
+    #     admin = User(name='admin', password=encrypted)
+    #     DBSession.add(admin)

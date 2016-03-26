@@ -1,45 +1,30 @@
 # coding=utf-8
-from .models import DBSession, Entry
-from .form_new import NewBlogEntryForm
+from journalapp.form_new import NewBlogEntryForm
+from journalapp.form_login import LoginForm
+from journalapp.models import DBSession, Entry
+from journalapp.models import edit_entry, new_entry, query_post, query_table
+from journalapp.security import is_valid_pw
+
 from pyramid.httpexceptions import HTTPFound, HTTPNotFound
+from pyramid.security import remember, forget, authenticated_userid
 from pyramid.view import view_config
-from sqlalchemy import desc
+
 from sqlalchemy.exc import IntegrityError
+
 from webob.multidict import NoVars
 
 
-def query_table():
-    return DBSession.query(Entry).order_by(desc(Entry.created))
-
-
-def query_post(post_id):
-    return DBSession.query(Entry).get(post_id)
-
-
-def new_entry(new_title=None, new_text=None):
-    DBSession.add(Entry(title=new_title, text=new_text))
-    DBSession.flush()
-    new_id = DBSession.query(Entry).order_by(desc(Entry.created))[0].id
-    return new_id
-
-
-def edit_entry(pkey, new_title, new_text):
-    update_dict = {
-        "title": new_title,
-        "text": new_text,
-    }
-    DBSession.query(Entry).filter(Entry.id==pkey).update(update_dict)
-    DBSession.flush()
-    return pkey
-
-
-@view_config(route_name='home', renderer='templates/blog_home.jinja2')
+@view_config(route_name='home',
+             renderer='templates/blog_home.jinja2',
+             permission='view')
 def home(request):
     all_posts = query_table()
     return dict(blog_posts=all_posts)
 
 
-@view_config(route_name='detail', renderer='templates/blog_detail.jinja2')
+@view_config(route_name='detail',
+             renderer='templates/blog_detail.jinja2',
+             permission='view')
 def detail(request):
     pkey = request.matchdict.get("pkey")
     one_post = query_post(pkey)
@@ -48,8 +33,35 @@ def detail(request):
     return dict(post=one_post)
 
 
-@view_config(route_name='new', renderer='templates/blog_new.jinja2')
+@view_config(route_name='login',
+             renderer='templates/blog_login.jinja2',
+             permission='view')
+def login(request):
+    form = LoginForm(request.POST)
+    if request.method == 'POST' and form.validate():
+        username = form.username.data
+        password = form.password.data
+        if is_valid_pw(password):
+            headers = remember(request, username)
+            return HTTPFound(location='/', headers=headers)
+    return {'form': form}
+
+
+@view_config(route_name='logout',
+             permission='view')
+def logout(request):
+    if authenticated_userid(request):
+        headers = forget(request)
+        return HTTPFound(location='/', headers=headers)
+    return HTTPFound(location=request.route_url('login'))
+
+
+@view_config(route_name='new',
+             renderer='templates/blog_new.jinja2')
 def new(request):
+    if not authenticated_userid(request):
+        return HTTPFound(location=request.route_url('login'))
+
     form = NewBlogEntryForm(request.POST or NoVars())
     if request.method == "POST":
         new_pkey = new_entry(form.title.data, form.text.data)
@@ -58,8 +70,12 @@ def new(request):
     return {'form': form}
 
 
-@view_config(route_name='edit', renderer='templates/blog_edit.jinja2')
+@view_config(route_name='edit',
+             renderer='templates/blog_edit.jinja2')
 def edit(request):
+    if not authenticated_userid(request):
+        return HTTPFound(location=request.route_url('login'))
+
     pkey = request.matchdict.get("pkey")
     entry = DBSession.query(Entry).get(pkey)
     if entry is None:
@@ -75,3 +91,15 @@ def edit(request):
             form.errors.setdefault('error', []).append("Ah oh something "
                                                        "went wrong")
     return {'form': form}
+
+
+#@view_config(renderer='json', xhr=True)
+# def __json__(self, request):
+#     return {
+#         "id": self.title,
+#         "title": self.title,
+#         "text": self.text,
+#         "markdown": self.markdown,
+#         # "created": self.created.
+#     }
+#     pass

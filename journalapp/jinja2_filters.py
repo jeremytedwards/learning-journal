@@ -1,8 +1,12 @@
 # coding=utf-8
 
-def dateformat(date):
-    return date.strftime('%Y-%m-%d')
+
+def dateformat_monthfull(date):
+    return date.strftime('%B')
 
 
-def datetimeformat(date):
-    return date.strftime('%Y-%m-%d %I:%M %p')
+def dateformat_day(date):
+    return date.strftime('%d')
+
+
+

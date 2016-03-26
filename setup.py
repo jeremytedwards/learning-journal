@@ -10,11 +10,12 @@ with open(os.path.join(here, 'CHANGES.txt')) as f:
 
 requires = [
     'markdown',
-    'psycopg2',
+    'passlib',
     'pyramid',
     'pyramid_jinja2',
-    'pyramid_debugtoolbar',
     'pyramid_tm',
+    'psycopg2',
+    'requests',
     'SQLAlchemy',
     'transaction',
     'waitress',
@@ -32,6 +33,7 @@ tests_require = [
 
 dev_requires = [
     'ipython',
+    'pyramid_debugtoolbar',
     'pyramid-ipython',
 ]
 
@@ -65,5 +67,6 @@ setup(name='journalapp',
       main = journalapp:main
       [console_scripts]
       initializedb = journalapp.scripts.initializedb:main
+      migrate = journalapp.scripts.load_api:load_with_key
       """,
       )
