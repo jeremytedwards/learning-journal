@@ -23,6 +23,9 @@
         </div>
 {#        <a href="{{ request.route_url('edit', pkey=post.id) }}" class="image featured"><img src="../static/images/pic02.jpg" alt=""/></a>#}
         <p>{{ post.text | markdown | safe }}</p>
+{#        request.has_permission() #}
+        {% if request.has_permisison %}
         <p><a href="{{ request.route_url('edit', pkey=post.id) }}">&lt;&mdash;Edit</a></p>
+        {% endif %}
     </article>
 {% endblock %}
