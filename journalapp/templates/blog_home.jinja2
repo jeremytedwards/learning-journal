@@ -38,7 +38,7 @@
             </div>
 {#            <a href="#" class="image featured"><img src="images/pic01.jpg" alt="" /></a>#}
             <p>
-                {{ post.text }}
+                {{ post.text | markdown | safe  }}
             </p>
         </article>
     {% endfor %}
